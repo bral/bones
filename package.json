@@ -1,0 +1,28 @@
+{
+  "private": true,
+  "author": "Josh Faul <josh.faul@gmail.com> (http://jocafa.com)",
+  "name": "bones",
+  "description": "Boilerplate for my AMD JS stuff",
+  "version": "0.0.0",
+  "homepage": "",
+  "dependencies": {
+  },
+  "devDependencies": {
+    "coffee-script": "*",
+    "esprima": "*",
+    "uglify-js": "*",
+    "requirejs": "*",
+    "almond": "*",
+    "mocha": "*",
+    "expect.js": "*",
+    "stylus": "*",
+    "benchmark": "*",
+    "microtime": "*",
+    "dox": "*"
+  },
+  "optionalDependencies": {
+  },
+  "engines": {
+    "node": "*"
+  }
+}
