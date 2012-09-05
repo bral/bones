@@ -5,6 +5,9 @@
   "description": "Boilerplate for my AMD JS stuff",
   "version": "0.0.0",
   "homepage": "",
+  "scripts": {
+    "ast": "node scripts/ast.js"
+  },
   "dependencies": {
   },
   "devDependencies": {
