@@ -12,8 +12,11 @@
   },
   "devDependencies": {
     "coffee-script": "*",
+    "source-map": "*",
     "esprima": "*",
+    "escodegen": "*",
     "uglify-js": "*",
+    "jshint": "*",
     "requirejs": "*",
     "almond": "*",
     "mocha": "*",

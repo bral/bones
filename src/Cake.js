@@ -1,4 +1,5 @@
 ({
+  // lol comment
   extend: {'Goodies/Pastry': Pastry},
   use: {
     'Kitchen/Oven': Oven,

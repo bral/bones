@@ -4,11 +4,13 @@ PROJECT_NAME = bones
 NODE_MODULES = node_modules
 NODE_MODULES_BIN = $(NODE_MODULES)/.bin
 
+ESPARSE = $(NODE_MODULES_BIN)/esparse
 COFFEE = $(NODE_MODULES_BIN)/coffee
 MOCHA = $(NODE_MODULES_BIN)/mocha
 RJS = $(NODE_MODULES_BIN)/r.js
 STYLUS = $(NODE_MODULES_BIN)/stylus
 UGLIFYJS = $(NODE_MODULES_BIN)/uglifyjs
+JSHINT = $(NODE_MODULES_BIN)/jshint
 
 ALMONDJS = $(NODE_MODULES)/almond/almond.js
 
@@ -93,10 +95,10 @@ $(BUILD_COFFEE_FILES): build/plain/%.js: src/%.coffee
 
 
 
-build/$(PROJECT_NAME).js: $(SRC_COFFEE_FILES)
+build/$(PROJECT_NAME).js: $(BUILD_JS_FILES) $(BUILD_COFFEE_FILES)
 	@$(RJS) -o baseUrl=./build/plain out=build/$(PROJECT_NAME).js name=$(PROJECT_NAME) optimize=none wrap=true
 
-build/$(PROJECT_NAME)-almond.js: $(SRC_COFFEE_FILES)
+build/$(PROJECT_NAME)-almond.js: $(BUILD_JS_FILES) $(BUILD_COFFEE_FILES)
 	@$(RJS) -o baseUrl=./build/plain name=$(PROJECT_NAME) include=../../$(ALMONDJS) out=$@ wrap=true optimize=none insertRequire=$(PROJECT_NAME)
 
 
