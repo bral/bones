@@ -24,6 +24,7 @@
     "stylus": "*",
     "benchmark": "*",
     "microtime": "*",
+    "Nonsense": "*",
     "dox": "*"
   },
   "optionalDependencies": {
