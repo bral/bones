@@ -1,9 +1,13 @@
-# Change this to YOUR project's name
-PROJECT_NAME = bones
+# Options
+###############################################################################
+PROJECT_NAME ?= bones
+MOCHA_REPORTER ?= dot
 
 NODE_MODULES = node_modules
 NODE_MODULES_BIN = $(NODE_MODULES)/.bin
 
+# Shortcuts to Node Binaries
+###############################################################################
 ESPARSE = $(NODE_MODULES_BIN)/esparse
 COFFEE = $(NODE_MODULES_BIN)/coffee
 MOCHA = $(NODE_MODULES_BIN)/mocha
@@ -14,9 +18,9 @@ JSHINT = $(NODE_MODULES_BIN)/jshint
 
 ALMONDJS = $(NODE_MODULES)/almond/almond.js
 
-MOCHA_REPORTER = dot
 
 # Source and Build files
+###############################################################################
 SRC_JS_FILES = $(shell find src -name "*.js" -type f | sort)
 BUILD_JS_FILES = $(patsubst src/%,build/plain/%,$(SRC_JS_FILES))
 
@@ -32,33 +36,65 @@ BUILD_SCSS_FILES = $(patsubst src/%,build/plain/%,$(SRC_SCSS_FILES:.scss=.css))
 SRC_STYL_FILES = $(shell find src -name "*.styl" -type f | sort)
 BUILD_STYL_FILES = $(patsubst src/%,build/plain/%,$(SRC_STYL_FILES:.styl=.css))
 
-# Test files
+# Test Files
+###############################################################################
 TEST_JS_FILES = $(shell find test -name "*-test.js" -type f | sort)
 
-
+# Handy Targets
+###############################################################################
 all: \
 	setup \
 	build
 
+clean:
+	@rm -rf build
 
+setup: \
+	node_modules \
+	support
 
 node_modules:
 	@npm install
 
-setup: node_modules
+# Supporting Client-Side JS Libraries
+###############################################################################
+support: \
+	support/jquery.js \
+	support/underscore.js \
+	support/backbone.js \
+	support/moment.js \
+	support/require.js \
+	support/almond.js
 
+support/jquery.js:
+	@mkdir -p $(@D)
+	@curl http://code.jquery.com/jquery-1.8.1.js > $@
 
+support/underscore.js:
+	@mkdir -p $(@D)
+	@curl http://underscorejs.org/underscore.js > $@
 
-clean:
-	@rm -rf build
+support/backbone.js:
+	@mkdir -p $(@D)
+	@curl http://backbonejs.org/backbone.js > $@
 
+support/require.js:
+	@mkdir -p $(@D)
+	@curl http://requirejs.org/docs/release/2.0.6/comments/require.js > $@
 
+support/almond.js:
+	@mkdir -p $(@D)
+	@curl https://raw.github.com/jrburke/almond/latest/almond.js > $@
 
+support/moment.js:
+	@mkdir -p $(@D)
+	@curl https://raw.github.com/timrwood/moment/1.7.0/moment.js > $@
+
+# Builds
+###############################################################################
 %.min.js: %.js
 	@rm -f $@
 	@$(UGLIFYJS) < $< > $@
-
-
 
 build: \
 	build/plain \
@@ -83,7 +119,10 @@ $(BUILD_STYL_FILES): build/plain/%.css: src/%.styl
 	@stylus < $< > $@
 
 $(BUILD_SCSS_FILES): build/plain/%.css: src/%.scss
-	@compass compile $< --sass-dir=src --css-dir=build/plain --javascripts-dir=build/plain
+	@compass compile $< \
+		--sass-dir=src \
+		--css-dir=build/plain \
+		--javascripts-dir=build/plain
 
 $(BUILD_JS_FILES): build/plain/%.js: src/%.js
 	@mkdir -p $(@D)
@@ -93,17 +132,26 @@ $(BUILD_COFFEE_FILES): build/plain/%.js: src/%.coffee
 	@mkdir -p $(@D)
 	@coffee -sc < $< > $@
 
+build/$(PROJECT_NAME).js: support $(BUILD_JS_FILES)
+	@$(RJS) -o \
+		baseUrl=./build/plain \
+		out=build/$(PROJECT_NAME).js \
+		name=$(PROJECT_NAME) \
+		optimize=none \
+		wrap=true
 
+build/$(PROJECT_NAME)-almond.js: support $(BUILD_JS_FILES)
+	@$(RJS) -o \
+		baseUrl=./build/plain \
+		name=$(PROJECT_NAME) \
+		include=../../support/almond.js \
+		out=$@ \
+		wrap=true \
+		optimize=none \
+		insertRequire=$(PROJECT_NAME)
 
-build/$(PROJECT_NAME).js: $(BUILD_JS_FILES) $(BUILD_COFFEE_FILES)
-	@$(RJS) -o baseUrl=./build/plain out=build/$(PROJECT_NAME).js name=$(PROJECT_NAME) optimize=none wrap=true
-
-build/$(PROJECT_NAME)-almond.js: $(BUILD_JS_FILES) $(BUILD_COFFEE_FILES)
-	@$(RJS) -o baseUrl=./build/plain name=$(PROJECT_NAME) include=../../$(ALMONDJS) out=$@ wrap=true optimize=none insertRequire=$(PROJECT_NAME)
-
-
-
-# Tests
+# Testing
+###############################################################################
 test: test-unit
 
 test-unit: build/plain
@@ -114,8 +162,8 @@ test-phantom:
 
 test-all: test-unit test-phantom
 
-
-
+# Misc.
+###############################################################################
 .PHONY: \
 	clean \
 	setup \
