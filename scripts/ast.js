@@ -29,7 +29,7 @@ process.argv.slice(2).forEach(function (v, i, a) {
       ast = esprima.parse(jsFileContents, parseopts),
       gen;
       
-      genopts.sourceMap = jsFileName;
+      //genopts.sourceMap = jsFileName;
       gen = escodegen.generate(ast, genopts);
 
       console.log('====[ ' + jsFileName + ' ]====');

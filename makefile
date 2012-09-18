@@ -22,6 +22,7 @@ ALMONDJS = $(NODE_MODULES)/almond/almond.js
 # Source and Build files
 ###############################################################################
 SRC_JS_FILES = $(shell find src -name "*.js" -type f | sort)
+SRC_JS_DEPS = $(join $(dir $(SRC_JS_FILES)),$(addsuffix .d,$(addprefix .,$(notdir $(SRC_JS_FILES)))))
 BUILD_JS_FILES = $(patsubst src/%,build/plain/%,$(SRC_JS_FILES))
 
 SRC_COFFEE_FILES = $(shell find src -name "*.coffee" -type f | sort)
@@ -48,6 +49,7 @@ all: \
 
 clean:
 	@rm -rf build
+	@find src -name "*.d" -print0 | xargs -0 rm
 
 setup: \
 	node_modules \
@@ -92,11 +94,18 @@ support/moment.js:
 
 # Builds
 ###############################################################################
+deps: $(SRC_JS_DEPS)
+
+.%.js.d: %.js
+	@echo generating deps for $<
+	@node scripts/deps.js $< > $@
+
 %.min.js: %.js
 	@rm -f $@
 	@$(UGLIFYJS) < $< > $@
 
 build: \
+	deps \
 	build/plain \
 	build/$(PROJECT_NAME).js \
 	build/$(PROJECT_NAME).min.js \
@@ -126,7 +135,7 @@ $(BUILD_SCSS_FILES): build/plain/%.css: src/%.scss
 
 $(BUILD_JS_FILES): build/plain/%.js: src/%.js
 	@mkdir -p $(@D)
-	@cp $< $@
+	cp $< $@
 
 $(BUILD_COFFEE_FILES): build/plain/%.js: src/%.coffee
 	@mkdir -p $(@D)
@@ -149,6 +158,10 @@ build/$(PROJECT_NAME)-almond.js: support $(BUILD_JS_FILES)
 		wrap=true \
 		optimize=none \
 		insertRequire=$(PROJECT_NAME)
+
+ifneq "$(MAKECMDGOALS)" "clean"
+-include $(SRC_JS_DEPS)
+endif
 
 # Testing
 ###############################################################################
