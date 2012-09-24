@@ -41,11 +41,16 @@ BUILD_STYL_FILES = $(patsubst src/%,build/plain/%,$(SRC_STYL_FILES:.styl=.css))
 ###############################################################################
 TEST_JS_FILES = $(shell find test -name "*-test.js" -type f | sort)
 
+# Helpers
+###############################################################################
+define download
+@mkdir -p $(@D)
+@curl $1 > $@
+endef
+
 # Handy Targets
 ###############################################################################
-all: \
-	setup \
-	build
+all: build
 
 clean:
 	@rm -rf build
@@ -63,49 +68,53 @@ node_modules:
 support: \
 	support/jquery.js \
 	support/underscore.js \
+	support/underscore.string.js \
 	support/backbone.js \
 	support/moment.js \
 	support/require.js \
-	support/almond.js
+	support/almond.js \
+	support/d3.js
 
 support/jquery.js:
-	@mkdir -p $(@D)
-	@curl http://code.jquery.com/jquery-1.8.1.js > $@
+	@$(call download,http://code.jquery.com/jquery-1.8.1.js)
 
 support/underscore.js:
-	@mkdir -p $(@D)
-	@curl http://underscorejs.org/underscore.js > $@
+	@$(call download,http://underscorejs.org/underscore.js)
 
 support/backbone.js:
-	@mkdir -p $(@D)
-	@curl http://backbonejs.org/backbone.js > $@
+	@$(call download,http://backbonejs.org/backbone.js)
 
 support/require.js:
-	@mkdir -p $(@D)
-	@curl http://requirejs.org/docs/release/2.0.6/comments/require.js > $@
+	@$(call download,http://requirejs.org/docs/release/2.0.6/comments/require.js)
 
 support/almond.js:
-	@mkdir -p $(@D)
-	@curl https://raw.github.com/jrburke/almond/latest/almond.js > $@
+	@$(call download,https://raw.github.com/jrburke/almond/latest/almond.js)
 
 support/moment.js:
-	@mkdir -p $(@D)
-	@curl https://raw.github.com/timrwood/moment/1.7.0/moment.js > $@
+	@$(call download,https://raw.github.com/timrwood/moment/1.7.0/moment.js)
+
+support/d3.js:
+	@$(call download,http://d3js.org/d3.v2.js)
+
+support/underscore.string.js:
+	@$(call download,http://epeli.github.com/underscore.string/lib/underscore.string.js)
 
 # Builds
 ###############################################################################
-deps: $(SRC_JS_DEPS)
-
 .%.js.d: %.js
 	@echo generating deps for $<
 	@node scripts/deps.js $< > $@
+
+ifneq ($(MAKECMDGOALS),clean)
+-include $(SRC_JS_DEPS)
+endif
 
 %.min.js: %.js
 	@rm -f $@
 	@$(UGLIFYJS) < $< > $@
 
 build: \
-	deps \
+	node_modules \
 	build/plain \
 	build/$(PROJECT_NAME).js \
 	build/$(PROJECT_NAME).min.js \
@@ -158,10 +167,6 @@ build/$(PROJECT_NAME)-almond.js: support $(BUILD_JS_FILES)
 		wrap=true \
 		optimize=none \
 		insertRequire=$(PROJECT_NAME)
-
-ifneq "$(MAKECMDGOALS)" "clean"
--include $(SRC_JS_DEPS)
-endif
 
 # Testing
 ###############################################################################
