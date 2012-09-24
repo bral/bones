@@ -170,7 +170,21 @@ build/$(PROJECT_NAME)-almond.js: support $(BUILD_JS_FILES)
 
 # Testing
 ###############################################################################
-test: test-unit
+test/support: \
+	test/support/mocha-phantomjs.coffee \
+	test/support/mocha-phantomjs/core-extensions.js
+
+test/support/mocha-phantomjs.coffee:
+	@mkdir -p $(@D)
+	@curl https://raw.github.com/metaskills/mocha-phantomjs/master/lib/mocha-phantomjs.coffee > $@
+
+test/support/mocha-phantomjs/core-extensions.js:
+	@mkdir -p $(@D)
+	@curl https://raw.github.com/metaskills/mocha-phantomjs/master/lib/mocha-phantomjs/core_extensions.js > $@
+
+test: \
+	test/support \
+	test-unit
 
 test-unit: build/plain
 	@$(MOCHA) --reporter $(MOCHA_REPORTER) $(TEST_JS_FILES)
