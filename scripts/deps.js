@@ -34,10 +34,7 @@ process.argv.slice(2).forEach(function (v, i, a) {
       jsFileContents = fs.readFileSync(v),
       ast = esprima.parse(jsFileContents, parseopts)
       deps = findDeps(ast);
-      //console.log(JSON.stringify(ast, null, 2));
-      if (deps && deps.length) {
-        console.log('build/plain/' + jsFileName + ': ' + (findDeps(ast)).join(' '));
-      }
+      console.log('build/plain/' + jsFileName + ': ' + (findDeps(ast)).join(' '));
   } catch (o_O) {
     console.log('o_O');
     console.log(o_O);
