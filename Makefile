@@ -114,6 +114,7 @@ endif
 	@$(UGLIFYJS) < $< > $@
 
 build: \
+	node_modules \
 	build/plain \
 	build/$(PROJECT_NAME).js \
 	build/$(PROJECT_NAME).min.js \
@@ -121,7 +122,6 @@ build: \
 	build/$(PROJECT_NAME)-almond.min.js
 
 build/plain: \
-	node_modules \
 	$(BUILD_CSS_FILES) \
 	$(BUILD_STYL_FILES) \
 	$(BUILD_SCSS_FILES) \
