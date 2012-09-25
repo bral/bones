@@ -101,7 +101,7 @@ support/underscore.string.js:
 
 # Builds
 ###############################################################################
-.%.js.d: %.js
+.%.js.d: %.js node_modules
 	@echo generating deps for $<
 	@node scripts/deps.js $< > $@
 
@@ -114,7 +114,6 @@ endif
 	@$(UGLIFYJS) < $< > $@
 
 build: \
-	node_modules \
 	build/plain \
 	build/$(PROJECT_NAME).js \
 	build/$(PROJECT_NAME).min.js \
@@ -122,6 +121,7 @@ build: \
 	build/$(PROJECT_NAME)-almond.min.js
 
 build/plain: \
+	node_modules \
 	$(BUILD_CSS_FILES) \
 	$(BUILD_STYL_FILES) \
 	$(BUILD_SCSS_FILES) \
